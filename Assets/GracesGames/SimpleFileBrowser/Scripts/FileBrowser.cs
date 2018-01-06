@@ -44,6 +44,9 @@ namespace GracesGames.SimpleFileBrowser.Scripts {
 		// The user interface script for the file browser
 		private UserInterface _uiScript;
 
+		// Boolean to keep track whether the file browser is open
+		private static bool _isOpen;
+
 		// String used to filter files on name basis 
 		private string _searchFilter = "";
 
@@ -136,6 +139,11 @@ namespace GracesGames.SimpleFileBrowser.Scripts {
 			}
 
 			return path;
+		}
+		
+		// Returns whether the file browser is open
+		public static bool IsOpen() {
+			return _isOpen;
 		}
 
 		// Returns the current mode (save or load)
@@ -385,6 +393,8 @@ namespace GracesGames.SimpleFileBrowser.Scripts {
 
 		// Generic file browser panel to remove duplicate code
 		private void FilePanel(MonoBehaviour callerScript, string callbackMethod, string fileExtension) {
+			// Set _isOpen
+			_isOpen = true;
 			// Set values
 			_fileExtension = fileExtension;
 			_callerScript = callerScript;
@@ -395,6 +405,8 @@ namespace GracesGames.SimpleFileBrowser.Scripts {
 
 		// Destroy this file browser (the UI and the GameObject)
 		private static void Destroy() {
+			// Set _isOpen
+			_isOpen = false;
 			Destroy(GameObject.Find("FileBrowserUI"));
 			Destroy(GameObject.Find("FileBrowser"));
 		}
