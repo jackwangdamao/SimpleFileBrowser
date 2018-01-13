@@ -45,7 +45,7 @@ namespace GracesGames.SimpleFileBrowser.Scripts {
 		private UserInterface _uiScript;
 
 		// Boolean to keep track whether the file browser is open
-		private static bool _isOpen;
+		private bool _isOpen;
 
 		// String used to filter files on name basis 
 		private string _searchFilter = "";
@@ -142,7 +142,7 @@ namespace GracesGames.SimpleFileBrowser.Scripts {
 		}
 		
 		// Returns whether the file browser is open
-		public static bool IsOpen() {
+		public bool IsOpen() {
 			return _isOpen;
 		}
 
@@ -404,7 +404,7 @@ namespace GracesGames.SimpleFileBrowser.Scripts {
 		}
 
 		// Destroy this file browser (the UI and the GameObject)
-		private static void Destroy() {
+		private void Destroy() {
 			// Set _isOpen
 			_isOpen = false;
 			Destroy(GameObject.Find("FileBrowserUI"));

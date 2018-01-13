@@ -59,7 +59,6 @@ namespace GracesGames.SimpleFileBrowser.Scripts {
 			// Set the mode to save or load
 			FileBrowser fileBrowserScript = fileBrowserObject.GetComponent<FileBrowser>();
 			fileBrowserScript.SetupFileBrowser(PortraitMode ? ViewMode.Portrait : ViewMode.Landscape);
-			if (FileBrowser.IsOpen()) return;
 			if (fileBrowserMode == FileBrowserMode.Save) {
 				fileBrowserScript.SaveFilePanel(this, "SaveFileUsingPath", "DemoText", FileExtension);
 			} else {
