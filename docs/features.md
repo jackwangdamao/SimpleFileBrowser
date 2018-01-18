@@ -14,6 +14,7 @@ The simple file browser provides:
 *   Save and load files 
 *   Enforce and filter on file extension 
 *   Search for files in each directory 
+*   Define the default directory
 *   Support for multiple drives 
 
 *   Support for mobile devices
