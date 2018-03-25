@@ -73,8 +73,8 @@ namespace GracesGames.SimpleFileBrowser.Scripts {
 
 		private readonly FiniteStack<string> _forwardStack = new FiniteStack<string>();
 
-		// String file extension to filter results and save new files
-		private string _fileExtension;
+		// String array file extensions to filter results and save new files
+		private string[] _fileExtensions;
 
 		// Unity Action Event for closing the file browser
 		public event Action OnFileBrowserClose = delegate { };
@@ -324,10 +324,12 @@ namespace GracesGames.SimpleFileBrowser.Scripts {
 			foreach (string file in files) {
 				if (!File.Exists(file)) return;
 				// Hide files (no button) with incompatible file extensions when enabled
-				if (HideIncompatibleFiles && CompatibleFileExtension(file)) {
+				if (HideIncompatibleFiles)
 					_uiScript.CreateFileButton(file);
-				} else {
-					_uiScript.CreateFileButton(file);
+				else {
+					if (CompatibleFileExtension(file)) {
+						_uiScript.CreateFileButton(file);
+					}
 				}
 			}
 		}
@@ -342,7 +344,21 @@ namespace GracesGames.SimpleFileBrowser.Scripts {
 
 		// Returns whether the file given is compatible (correct file extension)
 		public bool CompatibleFileExtension(string file) {
-			return file.EndsWith("." + _fileExtension);
+			// Empty array, no filter
+			if (_fileExtensions.Length == 0) {
+				return true;
+			}
+
+			// Else check each file extension in file extensions array
+			foreach (string fileExtension in _fileExtensions) {
+				if (file.EndsWith("." + fileExtension)) {
+					return true;
+				}
+
+			}
+
+			// Not found, return not compatible
+			return false;
 		}
 
 		// When a directory is clicked, update the path and the file browser
@@ -359,7 +375,7 @@ namespace GracesGames.SimpleFileBrowser.Scripts {
 			if (_mode == FileBrowserMode.Save) {
 				string clickedFileName = Path.GetFileNameWithoutExtension(clickedFile);
 				CheckValidFileName(clickedFileName);
-				_uiScript.SetFileNameInputField(clickedFileName, _fileExtension);
+				_uiScript.SetFileNameInputField(clickedFileName, _fileExtensions[0]);
 			} else {
 				_currentFile = clickedFile;
 			}
@@ -368,37 +384,38 @@ namespace GracesGames.SimpleFileBrowser.Scripts {
 		}
 
 		// Opens a file browser in save mode
-		// Requires a default file and a file extension
-		public void SaveFilePanel(string defaultName, string fileExtension) {
-			// Make sure the file extension is not null, else set it to "" (no extension for the file to save)
-			if (fileExtension == null) {
-				fileExtension = "";
+		// Requires a default file and an array of file extensions
+		public void SaveFilePanel(string defaultName, string[] fileExtensions) {
+			// Make sure the file extension is not invalid, else set it to "" (no extension for the file to save)
+			if (fileExtensions == null || fileExtensions.Length == 0) {
+				fileExtensions = new string[1];
+				fileExtensions[0] = "";
 			}
 
 			_mode = FileBrowserMode.Save;
-			_uiScript.SetSaveMode(defaultName, fileExtension);
-			FilePanel(fileExtension);
+			_uiScript.SetSaveMode(defaultName, fileExtensions[0]);
+			FilePanel(fileExtensions);
 		}
 
 		// Opens a file browser in load mode
 		// Requires a file extension used to filter the loadable files
-		public void OpenFilePanel(string fileExtension) {
-			// Make sure the file extension is not invalid, else set it to * (no filter for load)
-			if (String.IsNullOrEmpty(fileExtension)) {
-				fileExtension = "*";
+		public void OpenFilePanel(string[] fileExtensions) {
+			// Make sure the file extensions are not invalid, else set it to an empty array (no filter for load)
+			if (fileExtensions == null || fileExtensions.Length == 0) {
+				fileExtensions = new string[0];
 			}
 
 			_mode = FileBrowserMode.Load;
 			_uiScript.SetLoadMode();
-			FilePanel(fileExtension);
+			FilePanel(fileExtensions);
 		}
 
 		// Generic file browser panel to remove duplicate code
-		private void FilePanel(string fileExtension) {
+		private void FilePanel(string[] fileExtensions) {
 			// Set _isOpen
 			_isOpen = true;
 			// Set values
-			_fileExtension = fileExtension;
+			_fileExtensions = fileExtensions;
 			// Call update once to set all files for initial directory
 			UpdateFileBrowser();
 		}
