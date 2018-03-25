@@ -229,6 +229,7 @@ namespace GracesGames.SimpleFileBrowser.Scripts.UI {
 			}
 
 			SetupButton(button, Path.GetFileName(file), FilesParent.transform, () => { _fileBrowser.FileClick(file); });
+			// Setup double click script for file button
 			button.GetComponent<FileButton>().Setup(_fileBrowser, file);
 		}
 
