@@ -229,6 +229,7 @@ namespace GracesGames.SimpleFileBrowser.Scripts.UI {
 			}
 
 			SetupButton(button, Path.GetFileName(file), FilesParent.transform, () => { _fileBrowser.FileClick(file); });
+			button.GetComponent<FileButton>().Setup(_fileBrowser, file);
 		}
 
 		// Generic method used to extract common code for creating a directory or file button
