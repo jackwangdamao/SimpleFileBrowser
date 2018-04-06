@@ -324,7 +324,7 @@ namespace GracesGames.SimpleFileBrowser.Scripts {
 			foreach (string file in files) {
 				if (!File.Exists(file)) return;
 				// Hide files (no button) with incompatible file extensions when enabled
-				if (HideIncompatibleFiles)
+				if (!HideIncompatibleFiles)
 					_uiScript.CreateFileButton(file);
 				else {
 					if (CompatibleFileExtension(file)) {
