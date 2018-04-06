@@ -76,7 +76,10 @@ namespace GracesGames.SimpleFileBrowser.Scripts {
 		// String file extension to filter results and save new files
 		private string _fileExtension;
 
+		// Unity Action Event for closing the file browser
 		public event Action OnFileBrowserClose = delegate { };
+
+		// Unity Action Event for selecting a file
 		public event Action<string> OnFileSelect = delegate { };
 
 		// ----- METHODS -----
