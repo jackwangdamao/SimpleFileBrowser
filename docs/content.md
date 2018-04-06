@@ -45,6 +45,7 @@ _Scripts_
     - UserInterface: the logic that sets up and updates the user interface based on information from the FileBrowser. Contains an abstract method implemented differently by the landscape and portrait version.
     - LandscapeUserInterface: the landscape version of the user interface
     - PortraitUserInterface: the portrait version of the user interface
+    - FileButton: handles the single and double click events for file buttons
 
 _Sprites_
 
