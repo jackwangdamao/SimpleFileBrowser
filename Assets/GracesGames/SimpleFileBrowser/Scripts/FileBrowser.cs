@@ -55,13 +55,6 @@ namespace GracesGames.SimpleFileBrowser.Scripts {
 		// Variable to set save or load mode
 		private FileBrowserMode _mode;
 
-		// MonoBehaviour script used to call this script
-		// Saved for the call back with the (empty) result
-		private MonoBehaviour _callerScript;
-
-		// Method to be called of the callerScript when selecting a file or closing the file browser
-		private string _callbackMethod;
-
 		// The current path of the file browser
 		// Instantiated using the current directory of the Unity Project
 		private string _currentPath;
@@ -82,6 +75,12 @@ namespace GracesGames.SimpleFileBrowser.Scripts {
 
 		// String file extension to filter results and save new files
 		private string _fileExtension;
+
+		// Unity Action Event for closing the file browser
+		public event Action OnFileBrowserClose = delegate { };
+
+		// Unity Action Event for selecting a file
+		public event Action<string> OnFileSelect = delegate { };
 
 		// ----- METHODS -----
 
@@ -113,8 +112,7 @@ namespace GracesGames.SimpleFileBrowser.Scripts {
 		private void SetupPath(string startPath) {
 			if (!String.IsNullOrEmpty(startPath) && Directory.Exists(startPath)) {
 				_currentPath = startPath;
-			}
-			else if (IsAndroidPlatform()) {
+			} else if (IsAndroidPlatform()) {
 				SetupAndroidVariables();
 				_currentPath = _rootAndroidPath;
 			} else {
@@ -145,7 +143,7 @@ namespace GracesGames.SimpleFileBrowser.Scripts {
 
 			return path;
 		}
-		
+
 		// Returns whether the file browser is open
 		public bool IsOpen() {
 			return _isOpen;
@@ -211,13 +209,15 @@ namespace GracesGames.SimpleFileBrowser.Scripts {
 			return Directory.GetParent(_currentPath) == null;
 		}
 
-		// Closes the file browser and send back an empty string
+		// Sends event on file browser close
+		// Then destroys the file browser
 		public void CloseFileBrowser() {
-			SendCallbackMessage("");
+			OnFileBrowserClose();
+			Destroy();
 		}
 
 		// When a file is selected (save/load button clicked), 
-		// send a message to the caller script
+		// send an event
 		public void SelectFile() {
 			// When saving, send the path and new file name, else the selected file
 			if (_mode == FileBrowserMode.Save) {
@@ -227,17 +227,17 @@ namespace GracesGames.SimpleFileBrowser.Scripts {
 				if (String.IsNullOrEmpty(inputFieldValue)) {
 					Debug.LogError("Invalid file name given");
 				} else {
-					SendCallbackMessage(_currentPath + "/" + inputFieldValue);
+					SendFileSelectEvent(_currentPath + "/" + inputFieldValue);
 				}
 			} else {
-				SendCallbackMessage(_currentFile);
+				SendFileSelectEvent(_currentFile);
 			}
 		}
 
-		// Sends back a message to the callerScript and callbackMethod
+		// Sends event on file select using path
 		// Then destroys the file browser
-		private void SendCallbackMessage(string message) {
-			_callerScript.SendMessage(_callbackMethod, message);
+		private void SendFileSelectEvent(string path) {
+			OnFileSelect(path);
 			Destroy();
 		}
 
@@ -368,10 +368,8 @@ namespace GracesGames.SimpleFileBrowser.Scripts {
 		}
 
 		// Opens a file browser in save mode
-		// Requires a caller script and a method for the callback result
-		// Also requires a default file and a file extension
-		public void SaveFilePanel(MonoBehaviour callerScript, string callbackMethod, string defaultName,
-			string fileExtension) {
+		// Requires a default file and a file extension
+		public void SaveFilePanel(string defaultName, string fileExtension) {
 			// Make sure the file extension is not null, else set it to "" (no extension for the file to save)
 			if (fileExtension == null) {
 				fileExtension = "";
@@ -379,13 +377,12 @@ namespace GracesGames.SimpleFileBrowser.Scripts {
 
 			_mode = FileBrowserMode.Save;
 			_uiScript.SetSaveMode(defaultName, fileExtension);
-			FilePanel(callerScript, callbackMethod, fileExtension);
+			FilePanel(fileExtension);
 		}
 
 		// Opens a file browser in load mode
-		// Requires a caller script and a method for the callback result 
-		// Also a file extension used to filter the loadable files
-		public void OpenFilePanel(MonoBehaviour callerScript, string callbackMethod, string fileExtension) {
+		// Requires a file extension used to filter the loadable files
+		public void OpenFilePanel(string fileExtension) {
 			// Make sure the file extension is not invalid, else set it to * (no filter for load)
 			if (String.IsNullOrEmpty(fileExtension)) {
 				fileExtension = "*";
@@ -393,17 +390,15 @@ namespace GracesGames.SimpleFileBrowser.Scripts {
 
 			_mode = FileBrowserMode.Load;
 			_uiScript.SetLoadMode();
-			FilePanel(callerScript, callbackMethod, fileExtension);
+			FilePanel(fileExtension);
 		}
 
 		// Generic file browser panel to remove duplicate code
-		private void FilePanel(MonoBehaviour callerScript, string callbackMethod, string fileExtension) {
+		private void FilePanel(string fileExtension) {
 			// Set _isOpen
 			_isOpen = true;
 			// Set values
 			_fileExtension = fileExtension;
-			_callerScript = callerScript;
-			_callbackMethod = callbackMethod;
 			// Call update once to set all files for initial directory
 			UpdateFileBrowser();
 		}

@@ -60,9 +60,13 @@ namespace GracesGames.SimpleFileBrowser.Scripts {
 			FileBrowser fileBrowserScript = fileBrowserObject.GetComponent<FileBrowser>();
 			fileBrowserScript.SetupFileBrowser(PortraitMode ? ViewMode.Portrait : ViewMode.Landscape);
 			if (fileBrowserMode == FileBrowserMode.Save) {
-				fileBrowserScript.SaveFilePanel(this, "SaveFileUsingPath", "DemoText", FileExtension);
+				fileBrowserScript.SaveFilePanel("DemoText", FileExtension);
+				// Subscribe to OnFileSelect event (call SaveFileUsingPath using path) 
+				fileBrowserScript.OnFileSelect += SaveFileUsingPath;
 			} else {
-				fileBrowserScript.OpenFilePanel(this, "LoadFileUsingPath", FileExtension);
+				fileBrowserScript.OpenFilePanel(FileExtension);
+				// Subscribe to OnFileSelect event (call LoadFileUsingPath using path) 
+				fileBrowserScript.OnFileSelect += LoadFileUsingPath;
 			}
 		}
 
